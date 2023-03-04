@@ -1,6 +1,9 @@
 using ChatGPT_Blazor.Data;
+using ChatGPT_Blazor.Interfaces.Services;
+using ChatGPT_Blazor.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using OpenAI.GPT3.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +11,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
+
+builder.Services.AddOpenAIService();
+
+builder.Services.AddScoped<IChatService, ChatService>();
 
 var app = builder.Build();
 

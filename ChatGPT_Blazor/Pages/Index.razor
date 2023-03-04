@@ -1,7 +1,75 @@
 ﻿@page "/"
+@using ChatGPT_Blazor.Interfaces.Services;
+@using OpenAI.GPT3.ObjectModels.RequestModels;
+@using OpenAI.GPT3.ObjectModels.ResponseModels;
+@inject IChatService ChatService;
 
 <PageTitle>Index</PageTitle>
 
-<RadzenText TextStyle="TextStyle.DisplayH1" TagName="TagName.H1">
-    Hello, Radzen Blazor!
-</RadzenText>
+<RadzenText TextStyle="TextStyle.DisplayH1" TagName="TagName.H1">Chat AI!</RadzenText>
+
+<RadzenCard class="mt-3">
+    <RadzenStack Orientation="Orientation.Vertical">
+        @foreach (var message in chatMessages.Where(w => !w.Role.Equals("system")))
+        {
+            @if (message.Role.Equals("assistant"))
+            {
+                <RadzenStack>
+                    <RadzenStack class="w-50">
+                        <RadzenStack Orientation="Orientation.Horizontal">
+                            <RadzenIcon Icon="school" Style="color:var(--rz-info-darker);" />Assistant
+                        </RadzenStack>
+                        <RadzenCard class="rz-background-color-info-lighter">
+                            @message?.Content
+                        </RadzenCard>
+                    </RadzenStack>
+                </RadzenStack>
+            }
+            else
+            {
+                <RadzenStack AlignItems="AlignItems.End">
+                    <RadzenStack class="w-50">
+                        <RadzenStack Orientation="Orientation.Horizontal">
+                            <RadzenIcon Icon="perm_identity" Style="color:var(--rz-success-darker);" />You
+                        </RadzenStack>
+                        <RadzenCard class="rz-background-color-success-lighter">
+                            @message?.Content
+                        </RadzenCard>
+                    </RadzenStack>
+                </RadzenStack>
+            }
+        }
+    </RadzenStack>
+</RadzenCard>
+
+<RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.End" class="mt-3">
+    <RadzenTextBox @bind-Value=@chatMessage class="w-50" />
+    <RadzenButton ButtonStyle="ButtonStyle.Primary" Click="GetChatCompletion" Text="Send" Style="width:120px" />
+</RadzenStack>
+
+@code {
+    private string chatMessage { get; set; } = string.Empty;
+
+    private List<ChatMessage> chatMessages { get; set; } = new List<ChatMessage>()
+    {
+        ChatMessage.FromSystem("You are a helpful assistant."),
+        ChatMessage.FromAssistance("Hello? Can I help you?"),
+    };
+
+    private ChatCompletionCreateResponse? chatCompletionCreateResponse;
+
+    private async Task GetChatCompletion()
+    {
+        chatMessages.Add(ChatMessage.FromUser(chatMessage));
+        chatMessage = string.Empty;
+
+        chatCompletionCreateResponse = await ChatService.Chat(chatMessages);
+
+        if (chatCompletionCreateResponse is null)
+        {
+            return;
+        }
+
+        chatMessages.Add(chatCompletionCreateResponse.Choices[0].Message);
+    }
+}
