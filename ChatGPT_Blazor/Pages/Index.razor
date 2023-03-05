@@ -25,35 +25,51 @@
         {
             @if (message.Role.Equals("assistant"))
             {
-                var messages = SplitMessage(message.Content);
+                @if (ValidateContent(message.Content))
+                {
+                    var messages = SplitMessage(message.Content);
 
-                <RadzenStack class="w-100">
-                    <RadzenStack>
-                        <RadzenStack Orientation="Orientation.Horizontal">
-                            <RadzenIcon Icon="school" Style="color:var(--rz-info-darker);" />Assistant
-                        </RadzenStack>
-                        <RadzenCard class="rz-background-color-info-lighter" Style="width:fit-content">
-                            @messages[2]
-                        </RadzenCard>
-                    </RadzenStack>
-                </RadzenStack>
-
-                <RadzenStack class="w-100">
-                    <RadzenStack>
-                        <RadzenStack Orientation="Orientation.Horizontal">
-                            <RadzenIcon Icon="lightbulb_circle" Style="color:var(--rz-warning-light);" />Suggestion
-                        </RadzenStack>
-                        <RadzenCard class="rz-background-color-warning-lighter" Style="width:fit-content">
-                            <RadzenCard >
-                                @messages[0] 
-                            </RadzenCard>
-                            <RadzenStack Orientation="Orientation.Horizontal" class="mt-2">
-                                @messages[1]
+                    <RadzenStack class="w-100">
+                        <RadzenStack>
+                            <RadzenStack Orientation="Orientation.Horizontal">
+                                <RadzenIcon Icon="school" Style="color:var(--rz-info-darker);" />Assistant
                             </RadzenStack>
-                        </RadzenCard>
+                            <RadzenCard class="rz-background-color-info-lighter" Style="width:fit-content">
+                                @messages[2]
+                            </RadzenCard>
+                        </RadzenStack>
                     </RadzenStack>
-                </RadzenStack>
-            }
+
+                    <RadzenStack class="w-100">
+                        <RadzenStack>
+                            <RadzenStack Orientation="Orientation.Horizontal">
+                                <RadzenIcon Icon="lightbulb_circle" Style="color:var(--rz-warning-light);" />Suggestion
+                            </RadzenStack>
+                            <RadzenCard class="rz-background-color-warning-lighter" Style="width:fit-content">
+                                <RadzenCard>
+                                    @messages[0]
+                                </RadzenCard>
+                                <RadzenStack Orientation="Orientation.Horizontal" class="mt-2">
+                                    @messages[1]
+                                </RadzenStack>
+                            </RadzenCard>
+                        </RadzenStack>
+                    </RadzenStack>
+                }
+                else
+                {
+                    <RadzenStack class="w-100">
+                        <RadzenStack>
+                            <RadzenStack Orientation="Orientation.Horizontal">
+                                <RadzenIcon Icon="school" Style="color:var(--rz-info-darker);" />Assistant
+                            </RadzenStack>
+                            <RadzenCard class="rz-background-color-info-lighter" Style="width:fit-content">
+                                @message.Content
+                            </RadzenCard>
+                        </RadzenStack>
+                    </RadzenStack>
+                }
+        }
             else
             {
                 <RadzenStack class="w-100">
@@ -145,4 +161,7 @@
 
         return result;
     }
+
+    private bool ValidateContent(string content)
+        => content.Contains("Correct") && content.Contains("CorrectReason") && content.Contains("Respond");
 }
