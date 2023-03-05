@@ -14,12 +14,12 @@
         {
             @if (message.Role.Equals("assistant"))
             {
-                <RadzenStack>
-                    <RadzenStack class="w-50">
+                <RadzenStack class="w-100">
+                    <RadzenStack>
                         <RadzenStack Orientation="Orientation.Horizontal">
                             <RadzenIcon Icon="school" Style="color:var(--rz-info-darker);" />Assistant
                         </RadzenStack>
-                        <RadzenCard class="rz-background-color-info-lighter">
+                        <RadzenCard class="rz-background-color-info-lighter" Style="width:fit-content">
                             @message?.Content
                         </RadzenCard>
                     </RadzenStack>
@@ -27,28 +27,45 @@
             }
             else
             {
-                <RadzenStack AlignItems="AlignItems.End">
-                    <RadzenStack class="w-50">
+                <RadzenStack class="w-100">
+                    <RadzenStack>
                         <RadzenStack Orientation="Orientation.Horizontal">
                             <RadzenIcon Icon="perm_identity" Style="color:var(--rz-success-darker);" />You
                         </RadzenStack>
-                        <RadzenCard class="rz-background-color-success-lighter">
+                        <RadzenCard class="rz-background-color-success-lighter" Style="width:fit-content" >
                             @message?.Content
                         </RadzenCard>
                     </RadzenStack>
                 </RadzenStack>
             }
         }
+        @if (isChatting)
+        {
+            <RadzenStack>
+                <RadzenStack>
+                    <RadzenStack Orientation="Orientation.Horizontal">
+                        <RadzenIcon Icon="school" Style="color:var(--rz-info-darker);" />Assistant
+                    </RadzenStack>
+                    <RadzenCard class="rz-background-color-info-lighter" >
+                        <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+                    </RadzenCard>
+                </RadzenStack>
+            </RadzenStack>
+        }
     </RadzenStack>
 </RadzenCard>
 
-<RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.End" class="mt-3">
-    <RadzenTextBox @bind-Value=@chatMessage class="w-50" />
-    <RadzenButton ButtonStyle="ButtonStyle.Primary" Click="GetChatCompletion" Text="Send" Style="width:120px" />
+<RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" class="mt-3 w-100">
+    <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.End" class="w-75">
+        <RadzenTextArea @bind-Value=@chatMessage class="w-100" Placeholder="Send messaga"/>
+        <RadzenButton ButtonStyle="ButtonStyle.Primary" Click="GetChatCompletion" Text="Send" Style="width:120px" Disabled=@isChatting />
+    </RadzenStack>
 </RadzenStack>
 
 @code {
     private string chatMessage { get; set; } = string.Empty;
+
+    private bool isChatting { get; set; } = false;
 
     private List<ChatMessage> chatMessages { get; set; } = new List<ChatMessage>()
     {
@@ -60,6 +77,7 @@
 
     private async Task GetChatCompletion()
     {
+        isChatting = true;
         chatMessages.Add(ChatMessage.FromUser(chatMessage));
         chatMessage = string.Empty;
 
@@ -71,5 +89,6 @@
         }
 
         chatMessages.Add(chatCompletionCreateResponse.Choices[0].Message);
+        isChatting = false;
     }
 }
