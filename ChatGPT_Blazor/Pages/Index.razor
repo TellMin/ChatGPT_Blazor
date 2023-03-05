@@ -10,17 +10,46 @@
 
 <RadzenCard class="mt-3">
     <RadzenStack Orientation="Orientation.Vertical">
+        <RadzenStack class="w-100">
+            <RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenIcon Icon="school" Style="color:var(--rz-info-darker);" />Assistant
+                </RadzenStack>
+                <RadzenCard class="rz-background-color-info-lighter" Style="width:fit-content">
+                    Come talk to me!
+                </RadzenCard>
+            </RadzenStack>
+        </RadzenStack>
+
         @foreach (var message in chatMessages.Where(w => !w.Role.Equals("system")))
         {
             @if (message.Role.Equals("assistant"))
             {
+                var messages = SplitMessage(message.Content);
+
                 <RadzenStack class="w-100">
                     <RadzenStack>
                         <RadzenStack Orientation="Orientation.Horizontal">
                             <RadzenIcon Icon="school" Style="color:var(--rz-info-darker);" />Assistant
                         </RadzenStack>
                         <RadzenCard class="rz-background-color-info-lighter" Style="width:fit-content">
-                            @message?.Content
+                            @messages[2]
+                        </RadzenCard>
+                    </RadzenStack>
+                </RadzenStack>
+
+                <RadzenStack class="w-100">
+                    <RadzenStack>
+                        <RadzenStack Orientation="Orientation.Horizontal">
+                            <RadzenIcon Icon="lightbulb_circle" Style="color:var(--rz-warning-light);" />Suggestion
+                        </RadzenStack>
+                        <RadzenCard class="rz-background-color-warning-lighter" Style="width:fit-content">
+                            <RadzenCard >
+                                @messages[0] 
+                            </RadzenCard>
+                            <RadzenStack Orientation="Orientation.Horizontal" class="mt-2">
+                                @messages[1]
+                            </RadzenStack>
                         </RadzenCard>
                     </RadzenStack>
                 </RadzenStack>
@@ -69,8 +98,11 @@
 
     private List<ChatMessage> chatMessages { get; set; } = new List<ChatMessage>()
     {
-        ChatMessage.FromSystem("You are a helpful assistant."),
-        ChatMessage.FromAssistance("Hello? Can I help you?"),
+        ChatMessage.FromSystem("You are a strict teacher of English grammar and spelling errors."),
+        ChatMessage.FromSystem("We are in the middle of an English lesson and we practice daily conversation."),
+        ChatMessage.FromSystem("Be sure to output the data according to the following format. Correct: <YOUR_CORRECTION> CorrectReason: <YOUR_CORECTION_REASON> Respond: <YOUR_RESPOND>"),
+        ChatMessage.FromSystem("In the \"Correct\" part, correct any grammatical or spelling errors, suggest better wording, and respond to the message with your reasons in 'CorrectReason' part."),
+        ChatMessage.FromSystem("In 'Respond' part, act as an American who likes conversation and respond message."),
     };
 
     private ChatCompletionCreateResponse? chatCompletionCreateResponse;
@@ -90,5 +122,27 @@
 
         chatMessages.Add(chatCompletionCreateResponse.Choices[0].Message);
         isChatting = false;
+    }
+
+    /// <summary>
+    /// Format of Contents is 'Correct: <YOUR_CORRECTION> CorrectReason: <YOUR_CORECTION_REASON> Respond: <YOUR_RESPOND>'
+    /// split Correct part and CorrectReason part and Respond part.
+    /// </summary>
+    /// <returns></returns>
+    private List<string> SplitMessage(string contets)
+    {
+        var split = contets.Split("CorrectReason:");
+
+        var correct = split[0].Replace("Correct:", "").Trim();
+        var correctReason = split[1].Split("Respond:")[0].Trim();
+        var respond = split[1].Split("Respond:")[1].Trim();
+
+        var result = new List<string>();
+
+        result.Add(correct ?? string.Empty);
+        result.Add(correctReason ?? string.Empty);
+        result.Add(respond ?? string.Empty);
+
+        return result;
     }
 }
