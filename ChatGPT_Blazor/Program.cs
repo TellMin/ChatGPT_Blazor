@@ -12,7 +12,19 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 
-builder.Services.AddOpenAIService();
+var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+
+if (string.IsNullOrEmpty(apiKey))
+{
+    builder.Services.AddOpenAIService();
+}
+else
+{
+    builder.Services.AddOpenAIService(settings => 
+    { 
+        settings.ApiKey = apiKey; 
+    });
+}
 
 builder.Services.AddScoped<IChatService, ChatService>();
 
