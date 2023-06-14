@@ -1,9 +1,7 @@
 ﻿using ChatGPT_Blazor.Interfaces.Services;
-using Microsoft.AspNetCore.SignalR;
 using OpenAI.Interfaces;
 using OpenAI.ObjectModels.RequestModels;
 using OpenAI.ObjectModels;
-using System;
 using OpenAI.ObjectModels.ResponseModels;
 
 namespace ChatGPT_Blazor.Services;

@@ -1,0 +1,62 @@
+﻿@page "/stream"
+@using ChatGPT_Blazor.Interfaces.Services;
+@using ChatGPT_Blazor.Interfaces;
+@using OpenAI.ObjectModels.RequestModels;
+@using OpenAI.ObjectModels.ResponseModels;
+@inject IStreamChatService StreamChatService;
+
+<PageTitle>StreamChat</PageTitle>
+
+<RadzenText TextStyle="TextStyle.DisplayH1" TagName="TagName.H1">Stream Chat!</RadzenText>
+
+<RadzenCard class="mt-3">
+    <RadzenStack Orientation="Orientation.Vertical">
+        <RadzenStack class="w-100">
+            <RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenIcon Icon="school" Style="color:var(--rz-info-darker);" />Assistant
+                </RadzenStack>
+                @if (!string.IsNullOrEmpty(responseMessage))
+                {
+                    <RadzenCard class="rz-background-color-info-lighter" Style="width:fit-content">
+                        @responseMessage
+                    </RadzenCard>
+                }
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenStack>
+</RadzenCard>
+
+<RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" class="mt-3 w-100">
+    <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.End" class="w-75">
+        <RadzenTextArea @bind-Value=@chatMessage class="w-100" Placeholder="Send messaga" />
+        <RadzenButton ButtonStyle="ButtonStyle.Primary" Click="GetChatCompletion" Text="Send" Style="width:120px" Disabled=@isChatting />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    private string chatMessage { get; set; } = string.Empty;
+
+    private bool isChatting { get; set; } = false;
+
+    private string responseMessage { get; set; } = string.Empty;
+
+    private async void GetChatCompletion()
+    {
+        isChatting = true;
+        responseMessage = string.Empty;
+        
+        var response = StreamChatService.StreamChat(chatMessage);
+        await foreach(var blob in response)
+        {
+            responseMessage += blob;
+            await InvokeAsync(StateHasChanged);
+            
+            // Allowing control to return to the renderer to update UI.
+            await Task.Delay(1);
+        }
+
+        isChatting = false;
+        await InvokeAsync(StateHasChanged);
+    }
+}

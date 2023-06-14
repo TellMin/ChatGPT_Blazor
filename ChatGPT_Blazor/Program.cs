@@ -1,4 +1,5 @@
 using ChatGPT_Blazor.Data;
+using ChatGPT_Blazor.Interfaces;
 using ChatGPT_Blazor.Interfaces.Services;
 using ChatGPT_Blazor.Services;
 using OpenAI.Extensions;
@@ -25,6 +26,7 @@ else
 }
 
 builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<IStreamChatService, StreamChatService>();
 
 var app = builder.Build();
 
