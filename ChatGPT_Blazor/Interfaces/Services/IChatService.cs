@@ -1,5 +1,5 @@
-﻿using OpenAI.GPT3.ObjectModels.RequestModels;
-using OpenAI.GPT3.ObjectModels.ResponseModels;
+﻿using OpenAI.ObjectModels.RequestModels;
+using OpenAI.ObjectModels.ResponseModels;
 
 namespace ChatGPT_Blazor.Interfaces.Services;
 

@@ -1,9 +1,8 @@
 using ChatGPT_Blazor.Data;
+using ChatGPT_Blazor.Interfaces;
 using ChatGPT_Blazor.Interfaces.Services;
 using ChatGPT_Blazor.Services;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using OpenAI.GPT3.Extensions;
+using OpenAI.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +26,7 @@ else
 }
 
 builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<IStreamChatService, StreamChatService>();
 
 var app = builder.Build();
 
